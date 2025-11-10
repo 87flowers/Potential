@@ -381,7 +381,7 @@ void uciProtocol(int argc, char *argv[], board *position, my_time *time_ctrl) {
 
     position->ply = 0;
     position->nmpPly = 0;
-
+    position->nmrSearch = false;
 
     for (int i = 0; i < 64;i++) {
         position->mailbox[i] = NO_PIECE;
