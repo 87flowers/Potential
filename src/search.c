@@ -1158,7 +1158,7 @@ int negamax(int alpha, int beta, int depth, board* pos, my_time* time, bool cutN
             }
                 
             pos->nmpPly = pos->ply + (depth - R) * 2 / 2;
-            int verificationScore = -negamax(beta - 1, beta, depth - R, pos, time, false);
+            int verificationScore = negamax(beta - 1, beta, depth - R, pos, time, false);
             pos->nmpPly = 0;
 
             if (verificationScore >= beta) {
