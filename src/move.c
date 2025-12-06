@@ -155,7 +155,7 @@ bool isKRP(int piece) {
     return piece == K || piece == k || piece == R || piece == r;
 }
 
-inline void toggleHashesForPiece(board* position, int piece, int square) {
+inline static void toggleHashesForPiece(board* position, int piece, int square) {
     position->hashKey ^= pieceKeys[piece][square];
     if (piece == P || piece == p) {
         position->pawnKey ^= pieceKeys[piece][square];
@@ -178,7 +178,7 @@ inline void toggleHashesForPiece(board* position, int piece, int square) {
     }
 }
 
-inline void addPiece(board* position, int piece, int square) {
+inline static void addPiece(board* position, int piece, int square) {
     setBit(position->bitboards[piece], square);
     setBit(position->occupancies[pieceColor(piece)], square);
     setBit(position->occupancies[both], square);
@@ -186,7 +186,7 @@ inline void addPiece(board* position, int piece, int square) {
     toggleHashesForPiece(position, piece, square);
 }
 
-inline void removePiece(board* position, int piece, int square) {
+inline static void removePiece(board* position, int piece, int square) {
     assert(position->mailbox[square] == piece);
     popBit(position->bitboards[piece], square);
     popBit(position->occupancies[pieceColor(piece)], square);
@@ -382,7 +382,7 @@ void generate_black_queen_side_castling(board *position, moves *moveList) {
     }
 }
 
-inline void splatPawnMoves(moves *moveList, U64 sourceBitboard, int shift, int mf) {
+inline static void splatPawnMoves(moves *moveList, U64 sourceBitboard, int shift, int mf) {
     while (sourceBitboard) {
         int sourceSquare = getLS1BIndex(sourceBitboard);
         int targetSquare = sourceSquare + shift;
@@ -393,7 +393,7 @@ inline void splatPawnMoves(moves *moveList, U64 sourceBitboard, int shift, int m
     }
 }
 
-inline void splatEnpassant(moves *moveList, U64 sourceBitboard, int enpassantSquare) {
+inline static void splatEnpassant(moves *moveList, U64 sourceBitboard, int enpassantSquare) {
     while (sourceBitboard) {
         int sourceSquare = getLS1BIndex(sourceBitboard);
 
@@ -403,7 +403,7 @@ inline void splatEnpassant(moves *moveList, U64 sourceBitboard, int enpassantSqu
     }
 }
 
-inline void splatNormalMoves(moves *moveList, int sourceSquare, U64 targetBitboard, int mf) {
+inline static void splatNormalMoves(moves *moveList, int sourceSquare, U64 targetBitboard, int mf) {
     while (targetBitboard) {
         int targetSquare = getLS1BIndex(targetBitboard);
 

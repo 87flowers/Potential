@@ -10,6 +10,8 @@ void parseFEN(char *fen, board* position) {
     memset(position->bitboards, 0ULL, sizeof(position->bitboards));
     // reset board occupancies (bitboards)
     memset(position->occupancies, 0ULL, sizeof(position->occupancies));
+    // reset mailbox
+    memset(position->mailbox, NO_PIECE, sizeof(position->mailbox));
 
     // reset game state variables
     position->side = 0;
@@ -22,39 +24,37 @@ void parseFEN(char *fen, board* position) {
     // reset repetition table
     memset(position->repetitionTable, 0ULL, sizeof(position->repetitionTable));
 
-    for (int rank = 0; rank < 8; rank++) {
-        for (int file = 0; file < 8; file++) {
-            int square = rank * 8 + file;
-            if ((*fen >= 'a' && *fen <= 'z') || (*fen >= 'A' && *fen <= 'Z')) {
+    // parse board
+    for (int square = 0; square < 64 && *fen; fen++) {
+        switch (*fen) {
+            case 'P': case 'N': case 'B': case 'R': case 'Q': case 'K':
+            case 'p': case 'n': case 'b': case 'r': case 'q': case 'k': {
                 int piece = charPieces[(unsigned char)*fen];
                 setBit(position->bitboards[piece], square);
                 position->mailbox[square] = piece;
-                fen++;
+                square++;
+                break;
             }
-            if (*fen >= '0' && *fen <= '9') {
-                int offset = *fen - '0';
-                int piece = -1;
-
-                // if there is a piece on current square
-                for (int bbPiece = P; bbPiece <= k; bbPiece++) {
-                    if (getBit(position->bitboards[bbPiece], square)) {
-                        piece = bbPiece;
-                    }
-                }
-                if (piece == -1) {
-                    file--;
-                }
-                file += offset;
-                fen++;
+            case '0': case '1': case '2': case '3': case '4':
+            case '5': case '6': case '7': case '8': case '9': {
+                square += *fen - '0';
+                break;
             }
-            if (*fen == '/') {
-                fen++;
+            case '/': {
+                break;
+            }
+            default: {
+                // TODO: Error detection
+                break;
             }
         }
     }
+
     fen++;
-    (*fen == 'w') ? (position->side = white) : (position->side = black);
+
+    position->side = (*fen == 'w') ? white : black;
     fen += 2;
+
     while (*fen != ' ') {
         switch (*fen) {
             case 'K':
@@ -75,8 +75,7 @@ void parseFEN(char *fen, board* position) {
         fen++;
     }
 
-    fen++;    
-
+    fen++;
 
     if (*fen != '-') {
         int file = fen[0] - 'a';
